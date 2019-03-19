@@ -1,11 +1,15 @@
 <template>
-    <div class="container">
-        <input type="text" @keyup.enter="handleAddClick" v-model="field">
+    <div class="toDo-wrap">
+        <h2>{{ title }}</h2>
+        <div class='toDo-title'>
+            <input type="text" @keyup.enter="handleAddClick" v-model="field">
+            <button class="btn-delete" @click="$emit('remove')">Delete ToDo list</button>
+        </div>
         <div class='todo'>
             <transition-group name="list" tag="ul">
-                <li class="todo-item" v-for="(item, index) in list" :key="index" v-ripple>
-                    <p>{{ item }}</p>
-                    <button @click="handleDeleteClick(index)">Delete</button>
+                <li class="todo-item" v-for="item in setKeys" :key="item.key" v-ripple>
+                    <p>{{ item.name }}</p>
+                    <button class="btn-delete" @click="handleDeleteClick(item.key)">Delete</button>
                 </li>
             </transition-group>
         </div>
@@ -19,16 +23,19 @@ export default {
         list: [],
         field: ''
     }),
-    // computed: {
-    //     setKeys: function() {
-    //         return this.list.map( (el, index) => {
-    //             return {
-    //                 name: el,
-    //                 key: index
-    //             }
-    //         } )
-    //     }
-    // },
+    props: {
+        title: String
+    },
+    computed: {
+        setKeys: function() {
+            return this.list.map( (el, index) => {
+                return {
+                    name: el,
+                    key: index
+                }
+            } )
+        }
+    },
     methods: {
         handleAddClick(e) {
             if(!e.target.value) return;
@@ -45,10 +52,17 @@ export default {
 </script>
 
 <style>
+    .toDo-title {
+        display: flex;
+        justify-content: space-between;
+    }
+    .toDo-wrap {
+        box-shadow: -1px 0px 14px 3px rgba(0,0,0,0.35);
+        padding: 20px;
+        margin-top: 40px;
+    }
     .todo ul {
         list-style: none;
-        width: 500px;
-        margin: auto;
         position: relative;
     }
     .todo-item {
@@ -66,7 +80,7 @@ export default {
         margin: 0;
         padding-top: 5px;
     }
-    .todo-item button {
+    .btn-delete {
         background-color: #23d160;
         border-color: transparent;
         color: #fff;
