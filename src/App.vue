@@ -7,7 +7,7 @@
       <input type="text" @keyup.enter="handleAddToDo" v-model="fieldToDo" />
     </div>
     <div>
-      <ToDo v-for="(item, i) in ToDolist" :key="i" :title="item.title" @remove="removeToDo(i)" />
+      <ToDo v-for="(item, i) in ToDolist" :key="item.title+i" :title="item.title" @remove="removeToDo(i)" />
     </div>
   </div>
 </template>

@@ -7,9 +7,14 @@
         </div>
         <div class='todo'>
             <transition-group name="list" tag="ul">
-                <li class="todo-item" v-for="item in setKeys" :key="item.key" v-ripple>
-                    <p>{{ item.name }}</p>
-                    <button class="btn-delete" @click="handleDeleteClick(item.key)">Delete</button>
+                <li class="todo-item" v-for="(item, i) in list" :key="i" v-ripple >
+                    <button class="btn-edit" @click="item.like++">Like {{ item.like }}</button>
+                    <div class='todo-item__context'>
+                        <p v-if="!item.edit">{{ item.name }}</p>
+                        <input v-if="item.edit" v-model='item.name' type="text">
+                    </div>
+                    <button class="btn-edit" @click="handleEditClick(i)">Edit</button>
+                    <button class="btn-delete" @click="handleDeleteClick(i)">Delete</button>
                 </li>
             </transition-group>
         </div>
@@ -26,26 +31,31 @@ export default {
     props: {
         title: String
     },
-    computed: {
-        setKeys: function() {
-            return this.list.map( (el, index) => {
-                return {
-                    name: el,
-                    key: index
-                }
-            } )
-        }
-    },
+    // computed: {
+    //     setKeys: function() {
+    //         return this.list.map( (el, index) => {
+    //             return {
+    //                 name: el,
+    //                 key: index
+    //             }
+    //         } )
+    //     }
+    // },
     methods: {
         handleAddClick(e) {
             if(!e.target.value) return;
-            this.list.push(
-                e.target.value,
-            );
+            this.list.push({
+                name: e.target.value,
+                like: 0,
+                edit: false
+            });
             this.field = '';
         },
         handleDeleteClick(index) {
             this.list.splice(index, 1);
+        },
+        handleEditClick(index) {
+            this.list[index].edit = !this.list[index].edit;
         }
     }
 }
@@ -73,12 +83,25 @@ export default {
         padding: 10px;
         display: flex;
         justify-content: space-between;
+        width: 100%;
         box-shadow: -1px 0px 14px 3px rgba(0,0,0,0.35);
         /* transition: all 1s; */
     }
     .todo-item p {
         margin: 0;
         padding-top: 5px;
+    }
+    .todo-item__context {
+        text-align: left;
+        flex: 1;
+    }
+    .btn-edit {
+        background-color: #237fdc;
+        border-color: transparent;
+        color: #fff;
+        border-radius: 4px;
+        padding: 5px;
+        margin-right: 5px;
     }
     .btn-delete {
         background-color: #23d160;
@@ -89,8 +112,10 @@ export default {
     }
 
     .list-enter-active,
+    .list-leave-active,
     .list-move {
         transition: 500ms cubic-bezier(0.59, 0.12, 0.34, 0.95);
+        transition-property: opacity, transform;
     }
     .list-enter {
         opacity: 0;
@@ -103,7 +128,7 @@ export default {
     }
 
     .list-leave-active {
-        transition: .5s ease;
+        position: absolute;
     }
 
     .list-leave-to {
